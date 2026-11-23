@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#07111f">
+<title>Cyber-Shield | Link Security Scanner</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+ font-family:Arial,sans-serif;
+ background:#07111f;color:#eaf2ff;
+ min-height:100vh;
+}
+header{
+ display:flex;justify-content:space-between;align-items:center;
+ padding:22px 8%;border-bottom:1px solid #1b3045;
+}
+.logo{font-size:23px;font-weight:bold;color:#45e0a3}
+.logo span{color:white}
+nav a{color:#b8c8d9;text-decoration:none;margin-left:22px;font-size:14px}
+.hero{text-align:center;padding:75px 20px 35px}
+.tag{
+ display:inline-block;padding:8px 15px;border:1px solid #24634e;
+ border-radius:30px;color:#45e0a3;font-size:12px;
+ margin-bottom:23px;letter-spacing:1px
+}
+h1{font-size:clamp(35px,6vw,58px);margin-bottom:18px}
+h1 span{color:#45e0a3}
+.hero p{color:#9eb0c4;line-height:1.7;max-width:600px;margin:auto}
+.container{max-width:850px;margin:25px auto;padding:0 20px}
+.scanner{
+ background:#101e30;border:1px solid #263d54;
+ padding:30px;border-radius:18px;
+ box-shadow:0 15px 50px #0005
+}
+.scanner label{display:block;font-weight:bold;margin-bottom:13px}
+.input-row{display:flex;gap:10px}
+input{
+ flex:1;min-width:0;padding:16px;
+ border:1px solid #344d66;border-radius:9px;
+ background:#071525;color:white;font-size:15px;outline:none
+}
+input:focus{border-color:#45e0a3}
+button{
+ border:0;border-radius:9px;padding:15px 24px;
+ background:#35d99b;color:#062219;font-weight:bold;
+ cursor:pointer;font-size:15px
+}
+button:hover{background:#62edb6}
+.hint{font-size:12px;color:#91a6bd;margin-top:12px}
+#result{display:none;margin-top:25px}
+.result-card{
+ background:#0a1726;border:1px solid #263d54;
+ padding:25px;border-radius:15px
+}
+.score-area{display:flex;align-items:center;gap:25px;flex-wrap:wrap}
+.score{
+ width:125px;height:125px;border-radius:50%;
+ display:grid;place-items:center;
+ border:8px solid #35d99b;
+ font-size:34px;font-weight:bold
+}
+.score small{font-size:12px;color:#9eb0c4}
+.status{font-size:23px;font-weight:bold;margin-bottom:10px}
+.description{color:#9eb0c4;line-height:1.6}
+.progress{height:9px;background:#24364a;border-radius:20px;margin:23px 0;overflow:hidden}
+#bar{height:100%;width:0;background:#35d99b;transition:width .5s}
+h3{margin:20px 0 12px}
+ul{list-style:none}
+li{padding:10px 0;border-bottom:1px solid #23364a;color:#bdccdc;line-height:1.5}
+li::before{content:"• ";color:#45e0a3;font-weight:bold}
+.advice{color:#9eb0c4;line-height:1.8;margin-top:15px}
+.notice{
+ font-size:12px;color:#91a6bd;margin-top:18px;
+ padding:12px;border:1px solid #30445b;border-radius:8px;line-height:1.6
+}
+.features{
+ display:grid;grid-template-columns:repeat(3,1fr);
+ gap:15px;margin:25px 0 60px
+}
+.feature{
+ background:#101e30;border:1px solid #263d54;
+ padding:22px;border-radius:13px
+}
+.feature b{color:#45e0a3;display:block;margin-bottom:10px}
+.feature p{color:#91a6bd;font-size:13px;line-height:1.6}
+footer{text-align:center;padding:25px;color:#8195aa;border-top:1px solid #1b3045;font-size:13px}
+@media(max-width:600px){
+ header{padding:18px 5%}nav a{margin-left:10px;font-size:12px}
+ .hero{padding-top:50px}
+ .scanner{padding:20px}
+ .input-row{flex-direction:column}
+ .features{grid-template-columns:1fr}
+ .score-area{justify-content:center;text-align:center}
+}
+</style>
+</head>
+<body>
+
+<header>
+ <div class="logo">🛡 CYBER<span>-SHIELD</span></div>
+ <nav><a href="#scanner">Scanner</a><a href="#about">About</a></nav>
+</header>
+
+<section class="hero">
+ <div class="tag">● SMART LINK SECURITY</div>
+ <h1>Stay Safe.<br><span>Scan Before You Click.</span></h1>
+ <p>Analyze suspicious URLs, identify potential phishing indicators,
+ and understand the security risks before visiting a website.</p>
+</section>
+
+<main class="container" id="scanner">
+ <div class="scanner">
+  <label for="urlInput">🔗 Enter Website URL</label>
+  <div class="input-row">
+   <input id="urlInput" type="text" placeholder="https://example.com">
+   <button id="scanBtn" onclick="scanURL()">SCAN NOW →</button>
+  </div>
+  <p class="hint">Enter a complete URL to start the security analysis.</p>
+
+  <section id="result">
+   <div class="result-card">
+    <div class="score-area">
+     <div class="score" id="scoreCircle">
+      <div><span id="score">0</span><small>/100</small></div>
+     </div>
+     <div>
+      <div class="status" id="status">Analysis Complete</div>
+      <p class="description" id="summary"></p>
+     </div>
+    </div>
+    <div class="progress"><div id="bar"></div></div>
+    <h3>🔍 Security Analysis</h3>
+    <ul id="findings"></ul>
+    <h3>🛡 Security Recommendations</h3>
+    <p class="advice" id="advice"></p>
+    <div class="notice">
+     ⚠️ This is a basic heuristic scanner, not a malware detection service.
+     A low score does not guarantee that a website is safe.
+     Do not enter passwords or personal information on suspicious websites.
+    </div>
+   </div>
+  </section>
+ </div>
+
+ <section class="features" id="about">
+  <div class="feature">
+   <b>🔎 URL Analysis</b>
+   <p>Checks URL structure and suspicious patterns.</p>
+  </div>
+  <div class="feature">
+   <b>⚡ Risk Scoring</b>
+   <p>Calculates a risk score from 0 to 100.</p>
+  </div>
+  <div class="feature">
+   <b>🛡 Protection Tips</b>
+   <p>Provides recommendations to help users stay safe.</p>
+  </div>
+ </section>
+</main>
+
+<footer>
+ © 2026 Cyber-Shield | Stay Alert. Stay Protected.
+</footer>
+
+<script>
+function scanURL(){
+ const input=document.getElementById("urlInput").value.trim();
+ const result=document.getElementById("result");
+ const findings=document.getElementById("findings");
+ const status=document.getElementById("status");
+ const summary=document.getElementById("summary");
+ const advice=document.getElementById("advice");
+ const scoreDisplay=document.getElementById("score");
+ const circle=document.getElementById("scoreCircle");
+ const bar=document.getElementById("bar");
+
+ if(!input){
+  alert("Please enter a URL first.");
+  return;
+ }
+
+ let url;
+ try{
+  url=new URL(/^https?:\/\//i.test(input)?input:"https://"+input);
+  if(!["http:","https:"].includes(url.protocol)) throw Error();
+  if(!url.hostname.includes(".")) throw Error();
+ }catch(e){
+  alert("Please enter a valid website URL.");
+  return;
+ }
+
+ let risk=0;
+ let reasons=[];
+ const host=url.hostname.toLowerCase();
+ const full=url.href.toLowerCase();
+ const parts=host.split(".");
+
+ function flag(points,message){
+  risk+=points;
+  reasons.push(message);
+ }
+
+ if(url.protocol!=="https:")
+  flag(15,"The URL does not use HTTPS encryption.");
+
+ if(/^\d{1,3}(\.\d{1,3}){3}$/.test(host))
+  flag(25,"The website uses an IP address instead of a domain name.");
+
+ if(full.includes("@"))
+  flag(25,"The URL contains an @ symbol, which can hide the actual destination.");
+
+ if(host.startsWith("xn--")||host.includes(".xn--"))
+  flag(20,"The domain contains internationalized characters (Punycode).");
+
+ const shorteners=[
+  "bit.ly","tinyurl.com","t.co","is.gd",
+  "rb.gy","cutt.ly","ow.ly","shorturl.at"
+ ];
+ if(shorteners.includes(host))
+  flag(20,"The URL uses a link-shortening service.");
+
+ if(parts.length>=5)
+  flag(10,"The domain contains many subdomains.");
+
+ if(full.length>100)
+  flag(10,"The URL is unusually long.");
+
+ const suspiciousWords=[
+  "login","verify","account","password","secure",
+  "update","banking","wallet","free","prize",
+  "claim","signin","confirm"
+ ];
+ const matched=suspiciousWords.filter(word=>full.includes(word));
+ if(matched.length>0)
+  flag(Math.min(matched.length*8,24),
+   "Suspicious keywords detected: "+matched.join(", ")+ ".");
+
+ const riskyTLD=[
+  "xyz","top","click","work","buzz","gq","tk","ml","cf"
+ ];
+ const tld=host.split(".").pop();
+ if(riskyTLD.includes(tld))
+  flag(15,"The domain uses a TLD that may deserve additional scrutiny.");
+
+ if(host.startsWith("www.")===false && host.split(".").length===2)
+  reasons.push("No unusual subdomain pattern was detected.");
+
+ risk=Math.min(100,risk);
+ if(reasons.length===0)
+  reasons.push("No suspicious patterns were found by these basic checks.");
+
+ let level,color,description,tips;
+
+ if(risk<30){
+  level="LOW RISK";
+  color="#35d99b";
+  description="Few suspicious indicators were detected. This does not guarantee safety.";
+  tips="Still verify the website address. Avoid sharing sensitive information unless you trust the website.";
+ }else if(risk<=50){
+  level="MEDIUM RISK";
+  color="#f5b942";
+  description="Some suspicious indicators were detected. Be careful before visiting.";
+  tips="Check the domain carefully. Do not enter passwords, payment details, or personal information.";
+ }else{
+  level="HIGH RISK";
+  color="#ff5b69";
+  description="Several suspicious indicators were detected. Avoid interacting with this link.";
+  tips="Do not open the link or download files from it. Verify its source independently.";
+ }
+
+ findings.innerHTML="";
+ reasons.forEach(reason=>{
+  const li=document.createElement("li");
+  li.textContent=reason;
+  findings.appendChild(li);
+ });
+
+ scoreDisplay.textContent=risk;
+ status.textContent=level;
+ status.style.color=color;
+ circle.style.borderColor=color;
+ bar.style.background=color;
+ summary.textContent=description;
+ advice.textContent=tips;
+
+ result.style.display="block";
+ bar.style.width=risk+"%";
+ result.scrollIntoView({behavior:"smooth",block:"nearest"});
+}
+
+document.getElementById("urlInput").addEventListener("keydown",function(e){
+ if(e.key==="Enter") scanURL();
+});
+</script>
+</body>
+</html>
