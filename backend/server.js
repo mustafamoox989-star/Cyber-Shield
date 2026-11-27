@@ -4,7 +4,7 @@ const express = require("express");
 const cors = require("cors");
 const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
-const { checkDomain } = require("./threat-intel");
+const { checkDomain, getStatus: getThreatIntelStatus } = require("./threat-intel");
 const { analyzeUrl } = require("./risk-engine");
 
 const app = express();
@@ -44,11 +44,14 @@ app.get("/", (_req, res) => {
 });
 
 app.get("/api/health", (_req, res) => {
+  const intel = getThreatIntelStatus();
   res.json({
     success: true,
     message: "Cyber Shield Backend is running",
     version: "3.3.0",
-    threatIntelligence: "CONNECTED_MODULE"
+    threatIntelligence: intel.available ? "READY" : "LOADING_OR_UNAVAILABLE",
+    threatDomainsLoaded: intel.domainCount,
+    threatFeedUpdatedAt: intel.lastUpdated
   });
 });
 
@@ -77,12 +80,7 @@ app.post("/api/scan", scanLimiter, (req, res) => {
     const threatIntelligence = checkDomain(parsed.hostname);
     const riskAnalysis = analyzeUrl(parsed.href, threatIntelligence);
 
-    return res.json({
-      success: true,
-      url: parsed.href,
-      threatIntelligence,
-      riskAnalysis
-    });
+    return res.json({ success: true, url: parsed.href, threatIntelligence, riskAnalysis });
   } catch (error) {
     console.error("[Scan] Error:", error);
     return res.status(500).json({ success: false, error: "The security engine could not complete the scan." });
@@ -99,7 +97,6 @@ app.listen(PORT, "0.0.0.0", () => {
   console.log(" CYBER SHIELD BACKEND 3.3.0");
   console.log("----------------------------------");
   console.log(`Server running on port ${PORT}`);
-  console.log("Threat Intelligence: CONNECTED MODULE");
   console.log("Risk Engine: ACTIVE");
   console.log("Status: ACTIVE");
 });
