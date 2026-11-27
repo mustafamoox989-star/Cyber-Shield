@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: cyber-shield-api
+    runtime: node
+    plan: free
+    region: singapore
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/health
+    autoDeploy: true
