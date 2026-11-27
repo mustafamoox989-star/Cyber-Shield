@@ -1,11 +1,12 @@
 {
   "name": "cyber-shield-backend",
-  "version": "3.2.0",
+  "version": "3.3.0",
   "private": true,
   "description": "Public API for Cyber Shield URL risk scanning",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "test": "node --test"
   },
   "engines": {
     "node": ">=20"
